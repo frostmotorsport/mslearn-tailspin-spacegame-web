@@ -2,6 +2,7 @@
 
 # Sets a Pipeline variable to true or false depending on whether or not the agent is running with admin rights.
 $hasacl = 0
+$AgentSID = ''
 
 Function AdminCheck {
     try {
