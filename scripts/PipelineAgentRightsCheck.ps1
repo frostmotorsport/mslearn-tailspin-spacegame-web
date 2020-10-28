@@ -28,8 +28,8 @@ Function SvcCtrlCheck {
 
     Write-Host "Checking Service Control ACL for Agent Service Account with SID '$AgentSID' in DACL '$dACL' for Service '$ServiceName'"
     
-    if (($dACL | select-string -Pattern $AgentSID) -eq 'NULL') {
-        Write-Error "User SID '$AgentSID' does not have Svc ACL"
+    if (($dACL | select-string -Pattern $AgentSID) -eq $null) {
+        Write-Warning "User SID '$AgentSID' does not have Svc ACL"
     }
     else {
         Write-Host "Agent has ACL already, no action required"
