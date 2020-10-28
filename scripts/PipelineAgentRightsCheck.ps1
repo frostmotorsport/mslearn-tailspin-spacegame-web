@@ -1,6 +1,7 @@
 # Azure DevOps Pipeline PowerShell Script
 
 # Sets a Pipeline variable to true or false depending on whether or not the agent is running with admin rights.
+$hasacl = 0
 
 Function AdminCheck {
     try {
@@ -24,7 +25,6 @@ Function SvcCtrlCheck {
 #cmd line must be sc.exe, otherwise "sc" by itself is something different....
     $dACL = sc.exe sdshow $ServiceName 
 
-    $hasacl = 0
     Write-Host "Checking Service Control ACL for Agent Service Account with SID '$AgentSID' in DACL '$dACL' for Service '$ServiceName'"
     
     if (($dACL | select-string -Pattern $AgentSID) -eq 'NULL') {
@@ -37,13 +37,17 @@ Function SvcCtrlCheck {
     }
 }
 
-
 # Main
+write-host "check if agent has svc rights"
+SvcCtrlCheck
 
-SetPipelineVariable -VariableName "agentHasAdminRights" -VariableValue (AdminCheck)
-
+write-host "check if agent has admin rights"
 $isadmin = (AdminCheck)
+SetPipelineVariable -VariableName "agentHasAdminRights" -VariableValue $isadmin
 
+
+write-host "if elevated and no svc rights, lets set them"
 if (($hasacl -eq 0) -and ($isadmin -eq "True")) {
+    write-host "set svc rights"
     sc.exe sdset $ServiceName "D:(A;;RPWPDTRC;;;{$AgentSID}(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWRPWPDTLOCRRC;;;SY)"
 }
