@@ -79,6 +79,8 @@ stages:
       displayName: 'Agent Rights Check'
       inputs:
         filePath: '$(Build.SourcesDirectory)\scripts\PipelineAgentRightsCheck.ps1'   
+        arguments: '-ServiceName $(MemCachedServiceName)'
+        failOnStderr: true
   
 # - job: infra_deploy 
 #   steps:

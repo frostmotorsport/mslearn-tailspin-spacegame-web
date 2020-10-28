@@ -4,6 +4,12 @@
 $hasacl = 0
 $AgentSID = ''
 
+Param (
+    [Parameter(Mandatory)]
+    [string] $ServiceName
+)
+
+
 Function AdminCheck {
     try {
         $agentWithAdminRights = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
