@@ -39,7 +39,7 @@ stages:
           - task: PowerShell@2
             displayName: 'Stop Memcached Service'
             inputs:
-              filePath: '$(Build.SourcesDirectory)\scripts\ManageService.ps1'
+              filePath: '$(Build.SourcesDirectory)\scripts\ManageServices.ps1'
               arguments: '-ServiceName $(MemCachedServiceName) -ServiceAction Stop'
               failOnStderr: true
         
