@@ -26,9 +26,9 @@ stages:
   jobs:
   - deployment:
     environment:
-      name: $environment
+      name: 'DEV'
       resourceType: VirtualMachine
-      tags: $(tags)
+      tags: 'DEV'
     workspace:
       clean: all
     strategy:
