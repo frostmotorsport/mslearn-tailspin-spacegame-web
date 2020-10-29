@@ -35,84 +35,18 @@ stages:
     runOnce:
       deploy:
         steps:
-#    - task: Npm@1
-#      displayName: 'Run npm install'
-#      inputs:
-#        verbose: false
-#    
-#    - script: './node_modules/.bin/node-sass $(wwwrootDir) --output $(wwwrootDir)'
-#      displayName: 'Compile Sass assets'
-#    
-#    - task: gulp@1
-#      displayName: 'Run gulp tasks'
-#    
-#    - script: 'echo "$(Build.DefinitionName), $(Build.BuildId), $(Build.BuildNumber)" > buildinfo.txt'
-#      displayName: 'Write build info'
-#      workingDirectory: $(wwwrootDir)
-#    
-#    - task: DotNetCoreCLI@2
-#      displayName: 'Restore project dependencies'
-#      inputs:
-#        command: 'restore'
-#        projects: '**/*.csproj'
-#    
-#    - task: DotNetCoreCLI@2
-#      displayName: 'Build the project - $(buildConfiguration)'
-#      inputs:
-#        command: 'build'
-#        arguments: '--no-restore --configuration $(buildConfiguration)'
-#        projects: '**/*.csproj'
-#    
-#    - task: DotNetCoreCLI@2
-#      displayName: 'Publish the project - $(buildConfiguration)'
-#      inputs:
-#        command: 'publish'
-#        projects: '**/*.csproj'
-#        publishWebProjects: false
-#        arguments: '--no-build --configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/$(buildConfiguration)'
-#        zipAfterPublish: true
-#    
-#    - task: WhiteSource Bolt@20
-#      displayName: 'Run WhiteSource Bolt'
-#        
-#    - task: PublishBuildArtifacts@1
-#      displayName: 'Publish Artifact: drop'
-#      condition: succeeded()
-#  
-       - task: PowerShell@2
-          displayName: 'Stop Memcached Service'
-         condition: false
-          inputs:
-            filePath: '$(Build.SourcesDirectory)\scripts\ManageService.ps1'
-            arguments: '-ServiceName $(MemCachedServiceName) -ServiceAction Stop'
-            failOnStderr: true
+
+        - task: PowerShell@2
+           displayName: 'Stop Memcached Service'
+          condition: false
+           inputs:
+             filePath: '$(Build.SourcesDirectory)\scripts\ManageService.ps1'
+             arguments: '-ServiceName $(MemCachedServiceName) -ServiceAction Stop'
+             failOnStderr: true
         
-       - task: PowerShell@2
-         displayName: 'Agent Rights Check'
-          inputs:
-            filePath: '$(Build.SourcesDirectory)\scripts\PipelineAgentRightsCheck.ps1'   
-            arguments: '-ServiceName $(MemCachedServiceName)'
-            failOnStderr: true
-  
-# - job: infra_deploy 
-#   steps:
-#   - template: Infra_DeploymentTemplate.yml
-#     parameters:
-#       environment: SIT
-#       tags: Infrastructure
-#       version: $(BuildVersion)
-#       dotNetVersionForWebsite: $(.NetFramework)
-#       appPoolName: APPpool
-#       websiteName: dummy.azure.net
-#       websiteBindings: some_things
-#       websitePhysicalPath: "/bin"
-#       appPoolUsername: dave
-#       appPoolPassword: Password123
-#       MemCachedServiceName: $(MemCachedServiceName)
-#       InTouchAuthConnectionString: $(ConnectionString_InTouchAuthorisation)
- 
-# - task: AzureWebApp@1
-#   inputs:
-#     azureSubscription: $(azuresub)
-#     appName: "dso-akv-demo-webapp"
-#     package: $(Build.ArtifactStagingDirectory)/$(buildConfiguration)/**/*.Web.zip
+        - task: PowerShell@2
+          displayName: 'Agent Rights Check'
+           inputs:
+             filePath: '$(Build.SourcesDirectory)\scripts\PipelineAgentRightsCheck.ps1'   
+             arguments: '-ServiceName $(MemCachedServiceName)'
+             failOnStderr: true
