@@ -28,7 +28,7 @@ stages:
     environment:
       name: $environment
       resourceType: VirtualMachine
-      tags: $tags
+      tags: $(tags)
     workspace:
       clean: all
     strategy:
