@@ -37,16 +37,15 @@ stages:
         steps:
 
         - task: PowerShell@2
-           displayName: 'Stop Memcached Service'
-          condition: false
-           inputs:
-             filePath: '$(Build.SourcesDirectory)\scripts\ManageService.ps1'
-             arguments: '-ServiceName $(MemCachedServiceName) -ServiceAction Stop'
-             failOnStderr: true
+          displayName: 'Stop Memcached Service'
+          inputs:
+            filePath: '$(Build.SourcesDirectory)\scripts\ManageService.ps1'
+            arguments: '-ServiceName $(MemCachedServiceName) -ServiceAction Stop'
+            failOnStderr: true
         
         - task: PowerShell@2
           displayName: 'Agent Rights Check'
-           inputs:
-             filePath: '$(Build.SourcesDirectory)\scripts\PipelineAgentRightsCheck.ps1'   
-             arguments: '-ServiceName $(MemCachedServiceName)'
-             failOnStderr: true
+          inputs:
+            filePath: '$(Build.SourcesDirectory)\scripts\PipelineAgentRightsCheck.ps1'   
+            arguments: '-ServiceName $(MemCachedServiceName)'
+            failOnStderr: true
