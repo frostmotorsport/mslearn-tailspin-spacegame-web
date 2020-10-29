@@ -35,6 +35,19 @@ stages:
       runOnce:
         deploy:
           steps:
+          - task: Npm@1
+           displayName: 'Run npm install'
+           inputs:
+           verbose: false
+    
+          - script: './node_modules/.bin/node-sass $(wwwrootDir) --output $(wwwrootDir)'
+            displayName: 'Compile Sass assets'
+  
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore project dependencies'
+            inputs:
+              command: 'restore'
+              projects: '**/*.csproj'
 
           - task: PowerShell@2
             displayName: 'Stop Memcached Service'
