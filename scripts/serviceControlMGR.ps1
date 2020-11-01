@@ -4,9 +4,10 @@
 
 Param (
     [Parameter(Mandatory)]
-    [string] $userName
+    [string] $ServiceName
 )
 
+$dACL = ''
 $hasacl = 0
 $AgentSID = ''
 
@@ -45,7 +46,17 @@ write-host "check if agent has admin rights"
 $isadmin = (AdminCheck)
 
 write-host "if no svc rights, lets set them"
+
+ $dACL = sc.exe sdshow $ServiceName 
+ $AgentSID = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).User.Value
+ $newACL = "$dACL(A;;RPWPDTRC;;;$AgentSID)"
+ write-host $newACL
+ write-host "IsAdmin is $isadmin and hasACL is $hasacl"
+
 if (($hasacl -eq 0) -and ($isadmin -eq "True")) {
-    write-host "set svc rights"
-    sc.exe sdset $ServiceName "D:(A;;RPWPDTRC;;;{$AgentSID}(A;;CCLCSWLOCRRC;;;AU)(A;;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;BA)(A;;CCLCSWRPWPDTLOCRRC;;;SY)"
-}
+    write-host "setting service rights for Agent User"
+    sc.exe sdset $ServiceName $newACL
+    }
+    else { 
+    write-host "Exiting no action" 
+    }
