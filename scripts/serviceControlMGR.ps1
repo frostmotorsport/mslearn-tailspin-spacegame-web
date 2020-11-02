@@ -3,13 +3,12 @@
 # Checks and Sets user rights using Service Control Manager.
 
 Param (
-    [Parameter(Mandatory)]
-    [string] $ServiceName
-)
+    [Parameter(Mandatory)][string] $ServiceName
+    )
 
-$dACL = ''
-$hasacl = 0
-$AgentSID = ''
+Set-Variable -name dACL -Value '' -Scope Global
+Set-Variable -name acl -Value 0 -Scope Global
+Set-Variable -name AgentSID -Value '' -Scope Global  
 
 Function AdminCheck {
     try {
@@ -23,34 +22,39 @@ Function AdminCheck {
 
 Function SvcCtrlCheck {
 
-    $AgentSID = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).User.Value
+    $Global:AgentSID = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).User.Value
 #cmd line must be sc.exe, otherwise "sc" by itself is something different....
-    $dACL = sc.exe sdshow $ServiceName 
+    $Global:dACL = sc.exe sdshow $ServiceName 
 
-    Write-Host "Checking Service Control ACL for Agent Service Account with SID '$AgentSID' in DACL '$dACL' for Service '$ServiceName'"
+    Write-Host "Checking Service Control ACL for Agent Service Account with SID '$Global:AgentSID' in DACL '$Global:dACL' for Service '$ServiceName'"
     
-    if (($dACL | select-string -Pattern $AgentSID) -eq $null) {
-        Write-Warning "User SID '$AgentSID' does not have Svc ACL"
+    if (($Global:dACL | select-string -Pattern $Global:AgentSID) -eq $null) {
+        Write-Warning "User SID '$Global:agentSID' does not have Svc ACL"
     }
     else {
         Write-Host "Agent has ACL already, no action required"
-        $hasacl = 1
+        $Global:acl = 1
         }
+    return $Global:acl
 }
 
 # Main
 write-host "check if agent has svc rights"
-SvcCtrlCheck
+$hasACL = (SvcCtrlCheck)
 
 write-host "check if agent has admin rights"
 $isadmin = (AdminCheck)
 
-write-host "if no svc rights, lets set them"
+ write-host "if no svc rights, lets set them"
+ 
+ #the following are for diag, so feel free to get rid of them once this is in production
+ write-host "Checking $ServiceName is in local dACL $Global:dACL with agentSID $Global:agentSID"
 
- $dACL = sc.exe sdshow $ServiceName 
- $AgentSID = ([System.Security.Principal.WindowsIdentity]::GetCurrent()).User.Value
- $newACL = "$dACL(A;;RPWPDTRC;;;$AgentSID)"
+ $newSEC = "(A;;RPWPDTRC;;;$Global:AgentSID)"
+ $newACL = "$($Global:dACL[1].substring(0,2))$newSEC$($Global:dACL[1].substring(2,$Global:dACL[1].length-2))"
+
  write-host $newACL
+ write-host "Service Name is $servicename"
  write-host "IsAdmin is $isadmin and hasACL is $hasacl"
 
 if (($hasacl -eq 0) -and ($isadmin -eq "True")) {
